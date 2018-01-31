@@ -1,6 +1,6 @@
 #appModules/outlook.py
 #A part of NonVisual Desktop Access (NVDA)
-#Copyright (C) 2006-2014 NVDA Contributors <http://www.nvaccess.org/>
+#Copyright (C) 2006-2018 NV Access Limited, Yogesh Kumar, Manish Agrawal, Joseph Lee, Davy Kager, Babbage B.V.
 #This file is covered by the GNU General Public License.
 #See the file COPYING for more details.
 
@@ -435,6 +435,15 @@ class UIAGridRow(RowWithFakeNavigation,UIA):
 				flagIcon=0
 			flagIconLabel=oleFlagIconLabels.get(flagIcon)
 			if flagIconLabel: textList.append(flagIconLabel)
+			# Replied or forwarded state for this message is available from the object's value.
+			# We must parse this value correctly, as it contains redundant information.
+			# The several states are localized and separated by a space.
+			# Example output: 'Message Replied Read'
+			valueParts = self._get_value().split(" ")
+			# The first valuePart is the type of the selection, e.g. Message, Contact.
+			# The last valuePart indicates whether the message is read or unread.
+			if len(valueParts)>=3:
+				textList.extend(valueParts[1:-1])
 			try:
 				attachmentCount=selection.attachments.count
 			except COMError:
