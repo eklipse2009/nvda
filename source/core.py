@@ -430,9 +430,9 @@ This initializes all modules such as audio, IAccessible, keyboard, mouse, and GU
 	# Doing this here is a bit ugly, but we don't want these modules imported
 	# at module level, including wx.
 	log.debug("Initializing core pump")
-	class CorePump(wx.Timer):
+	class CorePump(gui.NonReEntrantTimer):
 		"Checks the queues and executes functions."
-		def Notify(self):
+		def run(self):
 			global _isPumpPending
 			_isPumpPending = False
 			watchdog.alive()
@@ -449,9 +449,8 @@ This initializes all modules such as audio, IAccessible, keyboard, mouse, and GU
 			baseObject.AutoPropertyObject.invalidateCaches()
 			watchdog.asleep()
 			if _isPumpPending and not _pump.IsRunning():
-				# #3803: A pump was requested, but the timer was ignored by a modal loop
-				# because timers aren't re-entrant.
-				# Therefore, schedule another pump.
+				# #3803: Another pump was requested during this pump execution.
+				# As our pump is not re-entrant, schedule another pump.
 				_pump.Start(PUMP_MAX_DELAY, True)
 	global _pump
 	_pump = CorePump()

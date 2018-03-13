@@ -91,7 +91,7 @@ class SettingsDialog(wx.Dialog):
 		self.Bind(wx.EVT_BUTTON,self.onOk,id=wx.ID_OK)
 		self.Bind(wx.EVT_BUTTON,self.onCancel,id=wx.ID_CANCEL)
 		self.postInit()
-		self.Center(wx.BOTH | wx.CENTER_ON_SCREEN)
+		self.Center(wx.BOTH | wx.Center)
 
 	def __del__(self):
 		SettingsDialog._hasInstance=False
@@ -405,9 +405,9 @@ class VoiceSettingsSlider(wx.Slider):
 			newValue = min(self.Value + self.LineSize, self.Max)
 		elif key == wx.WXK_DOWN:
 			newValue = max(self.Value - self.LineSize, self.Min)
-		elif key == wx.WXK_PRIOR:
+		elif key == wx.WXK_PAGEUP:
 			newValue = min(self.Value + self.PageSize, self.Max)
-		elif key == wx.WXK_NEXT:
+		elif key == wx.WXK_PAGEDOWN:
 			newValue = max(self.Value - self.PageSize, self.Min)
 		elif key == wx.WXK_HOME:
 			newValue = self.Max
@@ -1784,7 +1784,7 @@ class AddSymbolDialog(wx.Dialog):
 		mainSizer.Fit(self)
 		self.SetSizer(mainSizer)
 		self.identifierTextCtrl.SetFocus()
-		self.Center(wx.BOTH | wx.CENTER_ON_SCREEN)
+		self.Center(wx.BOTH | wx.Center)
 
 class SpeechSymbolsDialog(SettingsDialog):
 
@@ -2075,7 +2075,11 @@ class InputGesturesDialog(SettingsDialog):
 			return identifier
 
 	def onTreeSelect(self, evt):
-		item = self.tree.Selection
+		# #7077: Check if the treeview is still alive.
+		try:
+			item = self.tree.Selection
+		except RuntimeError:
+			return
 		data = self.tree.GetItemPyData(item)
 		isKbEmuCategory = item == self._kbEmuCategory
 		isCommand = isinstance(data, inputCore.AllGesturesScriptInfo)

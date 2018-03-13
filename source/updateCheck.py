@@ -214,7 +214,7 @@ class AutoUpdateChecker(UpdateChecker):
 	AUTO = True
 
 	def __init__(self):
-		self._checkTimer = wx.PyTimer(self.check)
+		self._checkTimer = gui.NonReEntrantTimer(self.check)
 		if config.conf["update"]["startupNotification"] and isPendingUpdate():
 			secsTillNext = 0 # Display the update message instantly
 		else:
@@ -302,7 +302,7 @@ class UpdateResultDialog(wx.Dialog):
 		mainSizer.Add(sHelper.sizer, border=guiHelper.BORDER_FOR_DIALOGS, flag=wx.ALL)
 		self.Sizer = mainSizer
 		mainSizer.Fit(self)
-		self.Center(wx.BOTH | wx.CENTER_ON_SCREEN)
+		self.Center(wx.BOTH | wx.Center)
 		self.Show()
 
 	def onInstallButton(self, evt):
@@ -400,7 +400,7 @@ class UpdateDownloader(object):
 		"""
 		self._shouldCancel = False
 		# Use a timer because timers aren't re-entrant.
-		self._guiExecTimer = wx.PyTimer(self._guiExecNotify)
+		self._guiExecTimer = gui.NonReEntrantTimer(self._guiExecNotify)
 		gui.mainFrame.prePopup()
 		# Translators: The title of the dialog displayed while downloading an NVDA update.
 		self._progressDialog = wx.ProgressDialog(_("Downloading Update"),
@@ -551,7 +551,7 @@ class DonateRequestDialog(wx.Dialog):
 
 		self.Sizer = mainSizer
 		mainSizer.Fit(self)
-		self.Center(wx.BOTH | wx.CENTER_ON_SCREEN)
+		self.Center(wx.BOTH | wx.Center)
 		self.Show()
 
 	def onDonate(self, evt):
